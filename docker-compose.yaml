@@ -14,15 +14,22 @@ services:
       - "8080:80"
   init:
     image: node:18
-    profiles: ["deploy"]
-    environment:
-    - GIT_USER=helomach
-    - GIT_PASS=
-    - GIT_NAME="Heloisa Machado"
-    - GIT_MAIL="heloisamachado84@gmail.com"
-    - USE_SSH=false
-    - CURRENT_BRANCH="main"
+    profiles: ["init"]
     volumes:
       - ./:/src
     working_dir: /src
-    command: yarn deploy
+    command: npm install
+  deploy:
+    image: node:18
+    profiles: ["deploy"]
+    environment:
+      - GIT_USER=$GIT_USER
+      - GIT_PASS=$GIT_PASS
+      - GIT_NAME=$GIT_NAME
+      - GIT_MAIL=$GIT_MAIL
+      - USE_SSH=$USE_SSH
+      - CURRENT_BRANCH=$CURRENT_BRANCH
+    volumes:
+      - ./:/src
+    working_dir: /src
+    command: bash -c "git config --global user.email $GIT_MAIL && git config --global user.name $GIT_NAME && yarn deploy"
